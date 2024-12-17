@@ -1,186 +1,483 @@
-## Ogólna koncepcja aplikacji
+# E-Commerce Backend API
 
-Aplikacja będzie prostym sklepem internetowym, umożliwiającym użytkownikom przeglądanie dostępnych produktów, wyszukiwanie ich po nazwie, przeglądanie szczegółów wybranego produktu, dodawanie produktów do koszyka oraz finalizację zamówienia. Dodatkowo dostępna będzie funkcjonalność logowania i rejestracji nowych użytkowników (z użyciem JWT). Użytkownicy zalogowani będą mogli dodawać opinie do produktów, a także zarządzać swoim koszykiem. W projekcie wystąpi co najmniej dwóch poziomów uprawnień: użytkownik zwykły oraz administrator. Administrator może usuwać opinie wszystkich użytkowników oraz zarządzać bazą produktów.
+Welcome to the **E-Commerce Backend API**! This project is a robust backend solution for an e-commerce application, built using modern technologies such as **Node.js**, **Express**, **TypeScript**, and **Prisma** ORM. It provides comprehensive functionalities for user management, product handling, shopping cart operations, order processing, and product reviews.
 
-## Zakres funkcjonalny (minimalny, z możliwością rozszerzeń)
+## Table of Contents
 
-- **Strona główna**:
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Database Setup](#database-setup)
+- [Running the Application](#running-the-application)
+- [API Endpoints](#api-endpoints)
+  - [Authentication](#authentication)
+  - [Users](#users)
+  - [Products](#products)
+  - [Cart](#cart)
+  - [Orders](#orders)
+  - [Reviews](#reviews)
+- [Testing](#testing)
+- [Folder Structure](#folder-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
-  - Wyświetlenie listy wszystkich produktów (pobranie z API, np. `https://fakestoreapi.com/products` lub z lokalnego mocka/danych w bazie).
-  - Możliwość wyszukiwania produktów po nazwie.
-  - Podział na kategorie (opcjonalne, zależnie od danych).
+## Features
 
-- **Lista produktów**:
+- **User Management**: Register, login, update, and delete users with role-based access control (Admin, User, Moderator).
+- **Product Management**: CRUD operations for products, including inventory management.
+- **Shopping Cart**: Add, update, and remove products from the user's shopping cart.
+- **Order Processing**: Create, update, and manage orders with status tracking.
+- **Product Reviews**: Users can create, update, and delete reviews for products.
+- **Authentication & Authorization**: Secure JWT-based authentication with role-based authorization.
+- **Logging**: Comprehensive logging for monitoring and debugging.
+- **TypeScript**: Strongly-typed codebase for enhanced reliability and maintainability.
 
-  - Lista wszystkich dostępnych produktów: nazwa, krótki opis, cena, ew. kategoria.
-  - Filtrowanie / wyszukiwanie po nazwie.
+## Technologies Used
 
-- **Szczegóły produktu**:
+- **Node.js**: JavaScript runtime environment.
+- **Express**: Web framework for building APIs.
+- **TypeScript**: Superset of JavaScript for static typing.
+- **Prisma**: ORM for database interactions.
+- **PostgreSQL**: Relational database management system.
+- **JWT**: JSON Web Tokens for authentication.
+- **bcryptjs**: Library for hashing passwords.
+- **dotenv**: Module to load environment variables.
+- **Jest & Supertest**: Testing frameworks for unit and integration tests.
 
-  - Wyświetlenie szczegółowych informacji: nazwa, opis, cena, dostępna ilość.
-  - Pole do wyboru ilości i przycisk "Dodaj do koszyka".
-  - Możliwość dodania opinii (jeśli zalogowany użytkownik).
-    - Opinie zawierają e-mail (z konta lub wprowadzony przez użytkownika), treść, ocenę w gwiazdkach.
-    - Walidacja formularza opinii (np. minimalna długość, poprawny format e-maila).
-    - Każdy zalogowany użytkownik może dodać tylko jedną opinię do danego produktu.
-    - Administracja opiniami:
-      - Użytkownik może edytować/usunąć tylko swoją opinię.
-      - Administrator może usuwać opinie wszystkich użytkowników.
+## Prerequisites
 
-- **Koszyk**:
+Before you begin, ensure you have met the following requirements:
 
-  - Dodawanie produktów do koszyka (z poziomu szczegółów produktu).
-  - Wyświetlanie zawartości koszyka: lista produktów, ilości, sumaryczna cena.
-  - Edycja ilości lub usuwanie produktów z koszyka.
-  - Po zalogowaniu możliwość finalizacji zamówienia (przejście do "Historia zamówień").
-  - Jeśli użytkownik spróbuje przejść do koszyka lub historii zamówień bez logowania, zostanie przekierowany do strony logowania.
+- **Node.js**: Install the latest LTS version from [nodejs.org](https://nodejs.org/).
+- **npm**: Comes with Node.js. Verify installation with `npm -v`.
+- **PostgreSQL**: Install PostgreSQL from [postgresql.org](https://www.postgresql.org/).
+- **Git**: Version control system. Install from [git-scm.com](https://git-scm.com/).
 
-- **Logowanie i rejestracja**:
-  - Logowanie zamockowanymi danymi (np. przechowywane w bazie lub pliku JSON), każda osoba z zespołu ma swoje konto. Dodatkowo konto prowadzącego (np. "admin" z rolą administratora).
-  - Rejestracja nowych użytkowników (hasło szyfrowane po stronie serwera).
-  - Po zalogowaniu generowany jest JWT + refresh token.
-  - Zachowanie sesji użytkownika (odświeżanie tokena, pamiętanie stanu zalogowania).
-- **Historia zamówień**:
-  - Wyświetlenie listy wszystkich zamówień danego użytkownika.
-  - Szczegóły pojedynczego zamówienia (lista produktów, daty, ceny).
-- **Panel administratora** (rozszerzenie):
-  - Zarządzanie produktami (CRUD na produktach).
-  - Usuwanie opinii dowolnych użytkowników.
-  - Podgląd wszystkich zamówień.
-- **Dane / Mocki**:
-  - Część danych (produkty, użytkownicy) może być na początku zamockowana w pliku JSON lub w pamięci serwera.
-  - Docelowo, aby zdobyć więcej punktów, zastosowanie bazy danych i serwera z pełnym CRUD (np. PostgreSQL + Node.js).
+## Installation
 
-## Technologie
+1. **Clone the Repository**
 
-- **Frontend**:
+   ```bash
+   git clone https://github.com/yourusername/ecommerce-backend.git
+   cd ecommerce-backend
+   ```
 
-  - Framework: **React** (lub Angular/Vue/Svelte - według preferencji zespołu, tutaj przykładowo React).
-  - Stylowanie: Material UI (lub inna biblioteka komponentów: React Bootstrap, Ant Design).
-  - Zarządzanie stanem: React Query (do komunikacji z API) + lokalny stan (useState/useContext) lub Redux Toolkit.
-  - Routing: React Router.
+2. **Install Dependencies**
 
-- **Backend**:
+   ```bash
+   npm install
+   ```
 
-  - Node.js + Express.js lub NestJS (dla lepszej struktury i TypeScriptu).
-  - Autentykacja: JWT + Refresh Token (Passport.js lub własna implementacja middleware).
-  - Walidacja danych po stronie serwera: Yup/Joi (przy Express) lub class-validator (NestJS).
-  - Baza danych: PostgreSQL (lub inna - może być SQLite/MySQL - wedle preferencji), z wykorzystaniem Prisma lub TypeORM do komunikacji z DB.
-  - Dokumentacja API: Postman Collection, zamieszczona w repozytorium.
+## Configuration
 
-- **Inne**:
-  - Wersjonowanie kodu: Git (GitHub/GitLab).
-  - Konteneryzacja (opcjonalnie): Docker i docker-compose (uruchomienie bazy danych, serwera, frontendu).
-  - CI/CD (opcjonalnie): GitHub Actions / GitLab CI.
+1. **Environment Variables**
 
-## Struktura projektu
+   Create a `.env` file in the root directory and configure the following variables:
 
-Przykładowa struktura w repozytorium (monorepo):
+   ```env
+   # Database Configuration
+   DATABASE_URL="postgresql://username:password@localhost:5432/ecommerce?schema=public"
+
+   # JWT Configuration
+   JWT_SECRET="your_jwt_secret_key"
+   REFRESH_SECRET="your_refresh_token_secret_key"
+
+   # Server Configuration
+   PORT=5000
+   FRONTEND_URL="http://localhost:3000"
+   ```
+
+   **Note**: Replace `username`, `password`, and other placeholders with your actual database credentials and secrets. Ensure that `.env` is added to `.gitignore` to prevent sensitive information from being exposed.
+
+2. **Prisma Configuration**
+
+   Prisma uses the `DATABASE_URL` from the `.env` file to connect to your database. Ensure that the URL is correctly formatted.
+
+## Database Setup
+
+1. **Run Prisma Migrations**
+
+   Apply the database schema defined in `schema.prisma` to your PostgreSQL database.
+
+   ```bash
+   npx prisma migrate dev --name init
+   ```
+
+   **Explanation:**
+
+   - `migrate dev`: Creates and applies migrations based on changes in `schema.prisma`.
+   - `--name init`: Name of the migration. You can use more descriptive names for future migrations.
+
+2. **Generate Prisma Client**
+
+   Generate the Prisma Client to enable type-safe database queries.
+
+   ```bash
+   npx prisma generate
+   ```
+
+3. **Seed the Database (Optional)**
+
+   Populate the database with initial data for testing.
+
+   ```bash
+   npm run seed
+   ```
+
+   **Note**: Ensure you have a seed script defined in `prisma/seed.ts`.
+
+## Running the Application
+
+Start the development server with hot-reloading.
+
+```bash
+npm run dev
+```
+
+**Available Scripts:**
+
+- `npm run dev`: Runs the application in development mode using `ts-node` or `nodemon`.
+- `npm run build`: Compiles TypeScript to JavaScript.
+- `npm start`: Runs the compiled JavaScript using Node.js.
+- `npm run seed`: Seeds the database with initial data.
+- `npm test`: Runs the test suites.
+
+## API Endpoints
+
+### Authentication
+
+- **Register User**
+
+  ```
+  POST /api/auth/register
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "securepassword",
+    "role": "USER" // Optional, defaults to USER
+  }
+  ```
+
+- **Login User**
+
+  ```
+  POST /api/auth/login
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "email": "john@example.com",
+    "password": "securepassword"
+  }
+  ```
+
+- **Refresh Token**
+
+  ```
+  POST /api/auth/refresh
+  ```
+
+### Users
+
+- **Get All Users** _(Admin Only)_
+
+  ```
+  GET /api/users
+  ```
+
+- **Get User by ID**
+
+  ```
+  GET /api/users/:id
+  ```
+
+- **Update User**
+
+  ```
+  PUT /api/users/:id
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "password": "newpassword", // Optional
+    "role": "ADMIN" // Optional
+  }
+  ```
+
+- **Delete User** _(Admin Only)_
+
+  ```
+  DELETE /api/users/:id
+  ```
+
+### Products
+
+_(Assuming you have product-related endpoints)_
+
+### Cart
+
+- **Get Cart**
+
+  ```
+  GET /api/cart
+  ```
+
+- **Add to Cart**
+
+  ```
+  POST /api/cart
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "productId": 1,
+    "quantity": 2
+  }
+  ```
+
+- **Update Cart Item**
+
+  ```
+  PUT /api/cart/:itemId
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "quantity": 3
+  }
+  ```
+
+- **Remove from Cart**
+
+  ```
+  DELETE /api/cart/:itemId
+  ```
+
+### Orders
+
+- **Get All Orders**
+
+  ```
+  GET /api/orders
+  ```
+
+- **Get Order by ID**
+
+  ```
+  GET /api/orders/:id
+  ```
+
+- **Create Order**
+
+  ```
+  POST /api/orders
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "items": [
+      {
+        "productId": 1,
+        "quantity": 2
+      },
+      {
+        "productId": 2,
+        "quantity": 1
+      }
+    ]
+  }
+  ```
+
+- **Update Order Status**
+
+  ```
+  PUT /api/orders/:id/status
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "status": "COMPLETED" // Options: PENDING, PROCESSING, COMPLETED, CANCELLED
+  }
+  ```
+
+- **Delete Order**
+
+  ```
+  DELETE /api/orders/:id
+  ```
+
+### Reviews
+
+- **Get Reviews by Product**
+
+  ```
+  GET /api/reviews/product/:productId
+  ```
+
+- **Create Review**
+
+  ```
+  POST /api/reviews
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "productId": 1,
+    "rating": 5,
+    "comment": "Great product!"
+  }
+  ```
+
+- **Update Review**
+
+  ```
+  PUT /api/reviews/:id
+  ```
+
+  **Body:**
+
+  ```json
+  {
+    "rating": 4,
+    "comment": "Good product."
+  }
+  ```
+
+- **Delete Review**
+
+  ```
+  DELETE /api/reviews/:id
+  ```
+
+## Testing
+
+The project uses **Jest** and **Supertest** for unit and integration testing.
+
+1. **Run Tests**
+
+   ```bash
+   npm test
+   ```
+
+2. **Test Coverage**
+
+   To generate a test coverage report:
+
+   ```bash
+   npm test -- --coverage
+   ```
+
+**Note**: Ensure you have defined your test scripts and test files appropriately in the `src/__tests__/` directory.
+
+## Folder Structure
 
 ```
-project-root/
-├─ backend/
-│  ├─ src/
-│  │  ├─ main.ts                  # punkt wejścia w przypadku NestJS
-│  │  ├─ modules/
-│  │  │  ├─ auth/                 # logowanie, rejestracja, JWT
-│  │  │  ├─ products/             # CRUD produktów
-│  │  │  ├─ users/                # zarządzanie użytkownikami
-│  │  │  ├─ orders/               # zamówienia, historia
-│  │  │  ├─ reviews/              # opinie
-│  │  │  └─ cart/                 # operacje na koszyku
-│  │  ├─ common/
-│  │  └─ config/
-│  ├─ test/
-│  ├─ prisma/                     # jeśli używamy Prisma do migracji DB
-│  ├─ package.json
-│  └─ tsconfig.json
-|
-├─ frontend/
-│  ├─ src/
-│  │  ├─ components/
-│  │  ├─ pages/                   # np. w Next.js lub screens w React Router
-│  │  ├─ hooks/
-│  │  ├─ context/
-│  │  ├─ services/                # komunikacja z backendem (fetch/axios)
-│  │  ├─ App.tsx
-│  │  └─ index.tsx
-│  ├─ public/
-│  ├─ package.json
-│  └─ tsconfig.json
-|
-├─ docker/
-│  ├─ docker-compose.yml          # definicja usług (db, backend, frontend)
-│  └─ Dockerfile(s)
-|
-├─ .env                           # zmienne środowiskowe dla backendu/frontendu
-├─ README.md                      # dokumentacja projektu, setup, opis funkcjonalności
-└─ postman_collection.json        # dokumentacja Postman
+backend/
+├── src/
+│   ├── controllers/
+│   │   ├── authController.ts
+│   │   ├── cartController.ts
+│   │   ├── orderController.ts
+│   │   ├── productController.ts
+│   │   ├── reviewController.ts
+│   │   └── userController.ts
+│   ├── middleware/
+│   │   ├── authMiddleware.ts
+│   │   ├── errorMiddleware.ts
+│   │   └── loggerMiddleware.ts
+│   ├── routes/
+│   │   ├── authRoutes.ts
+│   │   ├── cartRoutes.ts
+│   │   ├── orderRoutes.ts
+│   │   ├── productRoutes.ts
+│   │   ├── reviewRoutes.ts
+│   │   └── userRoutes.ts
+│   ├── services/
+│   │   └── authService.ts
+│   ├── utils/
+│   │   ├── logger.ts
+│   │   └── prisma.ts
+│   ├── types/
+│   │   └── express/
+│   │       └── index.d.ts
+│   ├── app.ts
+│   └── server.ts
+├── prisma/
+│   ├── schema.prisma
+│   └── seed.ts
+├── tests/
+│   ├── authController.test.ts
+│   ├── userController.test.ts
+│   └── ...
+├── logs/
+├── .env
+├── .gitignore
+├── package.json
+├── tsconfig.json
+└── README.md
 ```
 
-## Instrukcje uruchomienia (setup)
+## Contributing
 
-1. **Wymagania wstępne**:
-   - Node.js (LTS)
-   - npm lub yarn
-   - Docker (opcjonalnie, jeśli chcemy łatwo postawić bazę danych)
-2. **Zmienne środowiskowe**:
-   W pliku `.env` (w katalogu głównym) ustaw:
-   ```
-   DATABASE_URL=postgres://user:password@localhost:5432/shopdb
-   JWT_SECRET=super_secret_key
-   REFRESH_SECRET=another_super_secret_key
-   PORT=4000
-   ```
-3. **Uruchomienie bazy danych (opcjonalnie z Docker)**:
+Contributions are welcome! Please follow these steps to contribute:
+
+1. **Fork the Repository**
+
+2. **Create a Feature Branch**
 
    ```bash
-   cd docker
-   docker-compose up -d
-   # Uruchomi postgresa (i ewentualnie backend/frontend)
+   git checkout -b feature/YourFeature
    ```
 
-   Jeśli baza danych na lokalnym środowisku, zadbaj o jej konfigurację i migracje:
+3. **Commit Your Changes**
 
    ```bash
-   cd backend
-   npx prisma migrate dev
+   git commit -m "Add some feature"
    ```
 
-4. **Instalacja zależności i uruchomienie backendu**:
+4. **Push to the Branch**
+
    ```bash
-   cd backend
-   npm install
-   npm run start:dev
+   git push origin feature/YourFeature
    ```
-   Backend będzie dostępny na `http://localhost:4000`.
-5. **Instalacja zależności i uruchomienie frontendu**:
-   ```bash
-   cd ../frontend
-   npm install
-   npm run start
-   ```
-   Frontend będzie dostępny na `http://localhost:3000`.
-6. **Logowanie**:
 
-   - Aplikacja zawiera zamockowane konta użytkowników, np.:
-     - Admin: login: `admin`, hasło: `admin123`
-     - Użytkownik: login: `user1`, hasło: `user1234`
-   - Rejestracja nowych użytkowników dostępna z poziomu interfejsu.
+5. **Open a Pull Request**
 
-7. **Funkcjonalność**:
+## License
 
-   - Przeglądaj produkty, dodawaj do koszyka, loguj się, wystawiaj opinie, przeglądaj historię zamówień.
-   - Admin może edytować produkty, usuwać opinie.
+This project is licensed under the [MIT License](LICENSE).
 
-8. **Dokumentacja**:
-   - Szczegóły konfiguracji, użytych technologii, opis funkcjonalności, role w zespole oraz instrukcje będą w pliku `README.md`.
-   - Kolekcja Postmana do testowania backendu: `postman_collection.json`.
+## Contact
 
-## Dodatkowe punkty jakościowe
+If you have any questions or feedback, feel free to reach out:
 
-- Responsywny design (Material UI).
-- Testy jednostkowe na backendzie (Jest + Supertest) i front-endzie (React Testing Library).
-- Wykorzystanie CI/CD do automatyzacji wdrożeń.
-- Użycie refresh tokena do przedłużania sesji.
-- Estetyczny i przejrzysty interfejs użytkownika.
+- **Email**: your.email@example.com
+- **GitHub**: [yourusername](https://github.com/yourusername)
+
+---
+
+**Happy Coding!** 🚀

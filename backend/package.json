@@ -1,0 +1,43 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "description": "Backend dla prostego sklepu internetowego",
+    "main": "dist/server.js",
+    "scripts": {
+        "start": "node dist/server.js",
+        "start:dev": "nodemon src/server.ts",
+        "build": "tsc",
+        "test": "jest",
+        "prisma:generate": "prisma generate",
+        "prisma:migrate": "prisma migrate dev"
+    },
+    "keywords": [],
+    "author": "Twoje Imię",
+    "license": "ISC",
+    "dependencies": {
+        "@prisma/client": "^4.0.0",
+        "bcryptjs": "^2.4.3",
+        "cors": "^2.8.5",
+        "dotenv": "^10.0.0",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "winston": "^3.8.2"
+    },
+    "devDependencies": {
+        "@types/bcryptjs": "^2.4.2",
+        "@types/cors": "^2.8.17",
+        "@types/express": "^4.17.13",
+        "@types/jest": "^27.0.2",
+        "@types/jsonwebtoken": "^8.5.5",
+        "@types/node": "^18.15.0",
+        "@types/supertest": "^2.0.12",
+        "@types/winston": "^2.4.4",
+        "jest": "^27.3.1",
+        "nodemon": "^2.0.15",
+        "prisma": "^4.16.2",
+        "supertest": "^6.3.3",
+        "ts-jest": "^27.0.7",
+        "ts-node": "^10.4.0",
+        "typescript": "^4.4.4"
+    }
+}
