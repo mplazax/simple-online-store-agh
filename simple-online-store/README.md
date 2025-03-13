@@ -126,7 +126,6 @@ Aplikacja powinna być dostępna pod adresem `http://localhost:3000`.
 ## 👥 Autorzy
 
 - **Michał Plaza**
-- **Agnieszka Mirosław**
 
 ---
 
