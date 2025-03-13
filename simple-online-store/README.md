@@ -1,70 +1,135 @@
-# Getting Started with Create React App
+# 🛒 Simple Online Store
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Simple Online Store to pełnoprawna aplikacja e-commerce, pozwalająca użytkownikom na przeglądanie produktów, dodawanie ich do koszyka, składanie zamówień oraz przeglądanie historii zamówień. Projekt wykorzystuje **React** na frontendzie oraz **Node.js / Express.js** z **Sequelize** jako ORM dla bazy danych PostgreSQL.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📌 Funkcjonalności
 
-### `npm start`
+- ✅ Rejestracja i logowanie użytkowników
+- ✅ Przeglądanie listy produktów
+- ✅ Dodawanie produktów do koszyka
+- ✅ Usuwanie produktów z koszyka
+- ✅ Składanie zamówień
+- ✅ Historia zamówień użytkownika
+- ✅ Panel administratora (zarządzanie produktami i zamówieniami)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🏗️ Technologie
 
-### `npm test`
+### 🔹 Backend
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Node.js** + **Express.js** – Serwer API
+- **Sequelize** – ORM dla bazy danych PostgreSQL
+- **JWT (JSON Web Token)** – Autoryzacja użytkowników
+- **bcrypt** – Hashowanie haseł
 
-### `npm run build`
+### 🔹 Frontend
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **React.js** (z React Hooks + Context API)
+- **Axios** – Komunikacja z API
+- **Material-UI** – Komponenty UI
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 🔹 Baza danych
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **PostgreSQL** – Relacyjna baza danych
+- **Sequelize** – ORM do zarządzania modelami i migracjami
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🔧 Instalacja i konfiguracja
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. **Sklonuj repozytorium:**
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+   ```sh
+   git clone https://github.com/TwojRepozytorium/Simple-Online-Store.git
+   cd Simple-Online-Store
+   ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+2. **Backend**
 
-## Learn More
+   ```sh
+   cd backend
+   npm install
+   ```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+   Skonfiguruj plik `.env`:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+   ```env
+   PORT=5001
+   DATABASE_URL=postgres://user:password@localhost:5432/your_database
+   JWT_SECRET=your_jwt_secret
+   ```
 
-### Code Splitting
+   Uruchom migracje:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+   ```sh
+   npx sequelize db:migrate
+   ```
 
-### Analyzing the Bundle Size
+   Uruchom serwer:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+   ```sh
+   npm start
+   ```
 
-### Making a Progressive Web App
+3. **Frontend**
+   ```sh
+   cd frontend
+   npm install
+   npm start
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Aplikacja powinna być dostępna pod adresem `http://localhost:3000`.
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 🔗 API Endpoints
 
-### Deployment
+### 🔹 Użytkownicy
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- `POST /api/auth/register` – Rejestracja użytkownika
+- `POST /api/auth/login` – Logowanie użytkownika
+- `GET /api/auth/profile` – Pobranie profilu użytkownika (wymaga JWT)
 
-### `npm run build` fails to minify
+### 🔹 Produkty
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- `GET /api/products` – Pobranie wszystkich produktów
+- `GET /api/products/:id` – Pobranie szczegółów produktu
+- `POST /api/products` – Dodanie nowego produktu (wymaga admina)
+- `PUT /api/products/:id` – Edycja produktu (wymaga admina)
+- `DELETE /api/products/:id` – Usunięcie produktu (wymaga admina)
+
+### 🔹 Koszyk
+
+- `GET /api/cart` – Pobranie zawartości koszyka użytkownika
+- `POST /api/cart` – Dodanie produktu do koszyka
+- `DELETE /api/cart/:id` – Usunięcie produktu z koszyka
+
+### 🔹 Zamówienia
+
+- `POST /api/orders` – Składanie zamówienia
+- `GET /api/orders` – Historia zamówień użytkownika
+
+---
+
+## 🛠️ Możliwe ulepszenia
+
+- 🔜 Strona admina do zarządzania produktami i zamówieniami
+- 🔜 Obsługa płatności (np. Stripe lub PayPal)
+- 🔜 Ulepszony system recenzji produktów
+- 🔜 Powiadomienia e-mail o statusie zamówienia
+
+---
+
+## 👥 Autorzy
+
+- **Michał Plaza**
+- **Agnieszka Mirosław**
+
+---
+
+## 📜 Licencja
+
+Projekt jest dostępny na licencji MIT. Możesz go używać, modyfikować i dystrybuować dowolnie.
